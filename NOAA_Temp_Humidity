@@ -1,0 +1,65 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 19 11:00:42 2026
+
+@author: NobuI
+"""
+
+#Name: YOUR NAME
+#Date: CURRENT Date
+#Purpose: Gather weather data and create a plot
+
+
+from noaa_sdk import noaa
+import matplotlib.pyplot as plt
+import datetime
+
+
+
+
+name = "Elisha Brown"   #Change this to your name
+print(name)
+today = datetime.datetime.now()
+past = today - datetime.timedelta(days=10)
+startDate = past.strftime("%Y-%m-%d")
+endDate = today.strftime("%Y-%m-%d")
+
+#get NOAA data from api
+n = noaa.NOAA()
+observations =n.get_observations('85715','US',start=startDate,end=endDate)
+
+#Create two lists to store temperature and humidity
+temp = []
+humidity = []
+for obs in observations:
+    temp.append(obs['temperature']['value'])
+    humidity.append(obs['relativeHumidity']['value'])
+    print(obs['timestamp'] ,"\t",
+          obs['temperature']['value'], "\t",
+          obs['relativeHumidity']['value'], "\t",
+          obs['textDescription'])
+#print temperature vs humidity
+humidity = list(filter(None, humidity))
+temp = list(filter(None, temp))
+plt.figure()
+plt.plot(temp, label="Temperature")
+plt.plot(humidity, label="Humidity")
+plt.legend()
+plt.suptitle("Temperature vs Humidity")
+plt.savefig('weather.png')
+
+#creat a box plot
+plt.figure()
+box_data = [temp, humidity]
+plt.boxplot(box_data, labels = ['Temperature', 'Humidity'])
+plt.suptitle("Box Plot")
+plt.savefig('boxplot.png')
+
+#print statistics of weather data 
+avg_temp = sum(temp)/len(temp)
+low_temp = min(temp)
+high_temp = max(temp)
+print("Weather Statistics")
+print("The average temperature was: ",avg_temp)
+print("The lowet temperature was: ",low_temp)
+print("The highest temperature was: ",high_temp)
